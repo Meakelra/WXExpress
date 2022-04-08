@@ -1,5 +1,6 @@
 const path = require("path");
 const express = require("express");
+// const fs = require('fs');
 const request = require('request');
 const cors = require("cors");
 const morgan = require("morgan");
@@ -52,25 +53,22 @@ app.get("/api/wx_openid", async (req, res) => {
 
 app.post('/phone', (req, res) => {
   // 拼接 Header 中的 x-wx-openid 到接口中
-  const api = `http://api.weixin.qq.com/wxa/getopendata?openid=${req.headers['x-wx-openid']}`;
-  request(api, {
-    method: 'POST',
-    body: JSON.stringify({
-      cloudid_list: [req.body.cloudid], // 传入需要换取的 CloudID
-    }),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  }, (err, resp, body) => {
-    try {
-      const data = JSON.parse(body).data_list[0]; // 从回包中获取手机号信息
-      const phone = JSON.parse(data.json).data.phoneNumber;
-      // 将手机号发送回客户端，此处仅供示例
-      // 实际场景中应对手机号进行打码处理，或仅在后端保存使用
-      res.send(phone);
-    } catch (error) {
-      res.send('get phone failed');
-    }
+  // const api = `http://api.weixin.qq.com/wxa/getopendata?openid=${req.headers['x-wx-openid']}`;
+  request({
+      method: 'POST',
+      // url: 'http://api.weixin.qq.com/wxa/msg_sec_check?access_token=TOKEN',
+      url: 'http://api.weixin.qq.com/wxa/msg_sec_check', // 这里就是少了一个token
+      body: JSON.stringify({
+        openid: req.headers['x-wx-openid'], // 可以从请求的header中直接获取 req.headers['x-wx-openid']
+        version: 2,
+        scene: 2,
+        content: '安全检测文本'
+      })
+    },function (error, response) {
+      console.log('接口返回内容', response.body)
+      // return JSON.parse(response.body)
+	  res.send(JSON.parse(response.body));
+    })
   });
 });
 
