@@ -1,5 +1,6 @@
 const path = require("path");
 const express = require("express");
+const request = express.request;
 const cors = require("cors");
 const morgan = require("morgan");
 const { init: initDB, Counter } = require("./db");
